@@ -22,16 +22,6 @@ if fichier_charge is not None:
         
     st.subheader("Aperçu du jeu de données")
     st.dataframe(df.head())
-
-    # --- NOUVEAUTÉ : AUDIT GLOBAL DE LA BASE DE DONNÉES ---
-    st.markdown("### 🧹 Audit de la base de données")
-    total_vides_global = df.isnull().sum().sum() # Compte toutes les cases vides du fichier
-    
-    if total_vides_global > 0:
-        st.warning(f"La base de données contient un total de **{total_vides_global} valeurs vides** (toutes colonnes confondues).")
-    else:
-        st.success("La base de données est parfaitement propre (0 valeur vide).")
-    
     st.markdown("---")
 
     # 2. Paramétrage de l'analyse
@@ -39,16 +29,21 @@ if fichier_charge is not None:
     colonne_choisie = st.sidebar.selectbox("Sélectionnez la variable à analyser :", df.columns)
     type_variable = st.sidebar.radio("Type de la variable :", ["Quantitative", "Qualitative"])
 
-    # --- NOUVEAUTÉ : AUDIT SPÉCIFIQUE DE LA COLONNE CHOISIE ---
-    vides_colonne = df[colonne_choisie].isnull().sum()
-    donnees_propres = df[colonne_choisie].dropna() # On garde uniquement les données valides
+    # ==========================================
+    # AUDIT DE LA VARIABLE SÉLECTIONNÉE
+    # ==========================================
+    st.markdown(f"### 🧹 Audit de la variable : *{colonne_choisie}*")
     
-    st.markdown(f"### Analyse de la variable : *{colonne_choisie}*")
+    # On compte les vides UNIQUEMENT dans la colonne choisie
+    vides_colonne = df[colonne_choisie].isnull().sum()
+    donnees_propres = df[colonne_choisie].dropna() # On garde les données valides
     
     if vides_colonne > 0:
-        st.info(f"ℹ️ **Information :** {vides_colonne} ligne(s) vide(s) ignorée(s) pour les calculs de cette colonne.")
+        st.warning(f"⚠️ **Attention :** Cette colonne contient **{vides_colonne} valeur(s) vide(s)** (NaN). Elles ont été automatiquement ignorées pour ne pas fausser les calculs.")
     else:
-        st.info("ℹ️ **Information :** Toutes les lignes de cette colonne sont renseignées.")
+        st.success("✅ **Parfait :** Cette colonne est 100% propre (aucune valeur vide).")
+
+    st.markdown("---")
 
     # ==========================================
     # CAS 1 : VARIABLE QUANTITATIVE
@@ -108,7 +103,7 @@ if fichier_charge is not None:
         st.table(df_qualitatif)
         
         mode_val = donnees_propres.mode()[0]
-        st.success(f"**Le Mode** (la modalité la plus fréquente) est : **{mode_val}**")
+        st.info(f"**Le Mode** (la modalité la plus fréquente) est : **{mode_val}**")
 
 else:
     st.info("👈 Veuillez charger un fichier de données depuis le menu de gauche pour commencer.")
