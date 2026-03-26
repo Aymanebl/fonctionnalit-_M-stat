@@ -50,7 +50,7 @@ if module_choisi == MODULE_DESCRIPTIF:
     # ── Chargement du fichier ──
     st.sidebar.header("1. Charger les données")
     fichier = st.sidebar.file_uploader(
-        "Fichier CSV ou Excel", type=["csv", "xlsx"], key="fichier_desc"
+        "Fichier Excel", type=["csv", "xlsx"], key="fichier_desc"
     )
 
     if fichier is not None:
